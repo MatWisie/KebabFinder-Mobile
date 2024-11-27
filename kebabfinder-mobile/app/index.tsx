@@ -2,19 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Login from './auth/login';
-import IndexView from './main';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
 import { SendUserRequest } from '../helpers/authHelper'
 
 
 export default function Index() {
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
   const router = useRouter();
 
   useEffect(() => {
