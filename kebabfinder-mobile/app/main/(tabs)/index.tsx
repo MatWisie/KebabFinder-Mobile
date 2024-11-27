@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, ActivityIndicator, Modal, Text, TouchableOpacity, Image, Button } from 'react-native';
 import MapView, { UrlTile, Marker, Callout } from 'react-native-maps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SendRegisterRequest } from '../../helpers/mapHelper';
+import { SendRegisterRequest } from '../../../helpers/mapHelper';
 import { Kebab } from '@/interfaces/KebabTypes';
 import { Link, useRouter, useFocusEffect  } from 'expo-router';
 import axios from 'axios';
