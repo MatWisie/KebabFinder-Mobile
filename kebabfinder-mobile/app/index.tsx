@@ -18,7 +18,8 @@ export default function Index() {
           const userResponse = await SendUserRequest(userToken);
           if(userResponse.status >= 200 && userResponse.status < 300)
           {
-              await AsyncStorage.setItem('userId', userResponse.data.id.toString())
+              await AsyncStorage.setItem('userId', userResponse.data.id.toString());
+              await AsyncStorage.setItem('userName', userResponse.data.name);
               router.push('/main'); 
           }
 
