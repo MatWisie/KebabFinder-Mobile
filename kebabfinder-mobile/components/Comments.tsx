@@ -5,7 +5,6 @@ import { Comment, CommentPost } from '@/interfaces/CommentsTypes';
 import { Fontisto } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { handleRequestError } from '@/helpers/errorHelper';
-import { UserAvatar } from '@/helpers/userHelper';
 
 const CommentsComponent: React.FC<{ kebabId: number, endReached: boolean }> = ({ kebabId, endReached }) => {
     const [comments, setComments] = useState<Comment[]>([]);
@@ -65,7 +64,9 @@ const CommentsComponent: React.FC<{ kebabId: number, endReached: boolean }> = ({
     const renderComment = ({ item }: { item: Comment }) => {
         return (
             <View style={styles.commentContainer}>
-                <UserAvatar userName={item.user.name}/>
+                <View style={styles.avatarContainer}>
+                    <View style={styles.avatar}></View>
+                </View>
                 <View style={[styles.commentContent, {width:'100%'}]}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', flex: 1 }}>
                         <Text style={styles.userName}>{item.user.name}</Text>
@@ -79,6 +80,7 @@ const CommentsComponent: React.FC<{ kebabId: number, endReached: boolean }> = ({
 
     const loadMoreComments = () => {
         if (comments.length > commentsToShow) {
+            console.log('loaded more');
             setCommentsToShow(prev => prev + 5);
         }
     };
@@ -111,7 +113,10 @@ const CommentsComponent: React.FC<{ kebabId: number, endReached: boolean }> = ({
             <View style={[styles.modalOverlay]}>
                 <View style={[styles.modalContent,{width:'90%'}]}>
                     <View style={{flexDirection: 'row'}}>
-                        <UserAvatar userName={userName || ''} />
+                        
+                        <View style={styles.avatarContainer}>
+                            <View style={styles.avatar}></View>
+                        </View>
                         <View style={[styles.commentContent, {width:'80%'}]}>
                             <Text style={styles.userName}>{userName}</Text>
                             <TextInput
