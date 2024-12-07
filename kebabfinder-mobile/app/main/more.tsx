@@ -187,6 +187,7 @@ import { Kebab, MeatType, OrderWay, Sauce, SocialMedia } from '@/interfaces/Keba
                               </View>
                             )}
                         />
+                      <CommentsComponent kebabId={parsedKebab.id} endReached={endReached} />
         </>
       ) : (
         <Text>No Kebab Data Available</Text>
