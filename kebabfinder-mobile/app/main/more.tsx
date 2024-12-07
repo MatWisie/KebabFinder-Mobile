@@ -2,12 +2,14 @@ import { View, Text, TextInput, ScrollView, Button, StyleSheet, Image, FlatList,
 import React, { useState, useLayoutEffect } from 'react';
 import { Link, router, useLocalSearchParams, useRouter, useNavigation } from 'expo-router';
 import { Kebab, MeatType, OrderWay, Sauce, SocialMedia } from '@/interfaces/KebabTypes';
+import CommentsComponent from '@/components/Comments';
 
   const MoreView = () => {
     const { kebab } = useLocalSearchParams();  
     const parsedKebab : Kebab = kebab ? JSON.parse(kebab as string) : null;
     const navigation = useNavigation();
     const screenWidth = Dimensions.get('window').width - 40;
+    const [endReached, setEndReached] = useState(false);
 
     const renderMeatType = ({ item }: { item: MeatType }) => (
         <View>
@@ -31,8 +33,21 @@ import { Kebab, MeatType, OrderWay, Sauce, SocialMedia } from '@/interfaces/Keba
         }
       }, [navigation, parsedKebab]);
 
+      const handleScroll = (event: any) => {
+        const contentHeight = event.nativeEvent.contentSize.height;
+        const contentOffset = event.nativeEvent.contentOffset.y; 
+        const viewportHeight = event.nativeEvent.layoutMeasurement.height;
+      
+      
+        if (contentOffset + viewportHeight >= contentHeight - 20) {
+          setEndReached(true);
+        } else {
+          setEndReached(false);
+        }
+      };
+
     return (
-      <ScrollView>
+      <ScrollView onScroll={handleScroll}>
 
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-start', padding:20, backgroundColor:'#DCF2F1'}}>
         {parsedKebab ? (
@@ -187,6 +202,7 @@ import { Kebab, MeatType, OrderWay, Sauce, SocialMedia } from '@/interfaces/Keba
                               </View>
                             )}
                         />
+                      <CommentsComponent kebabId={parsedKebab.id} endReached={endReached} />
         </>
       ) : (
         <Text>No Kebab Data Available</Text>

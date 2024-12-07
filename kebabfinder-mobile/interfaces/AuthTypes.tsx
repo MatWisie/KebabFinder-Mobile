@@ -14,4 +14,3 @@ export interface UserRegisterData {
     onLogin: () => void; 
   }
 
-
