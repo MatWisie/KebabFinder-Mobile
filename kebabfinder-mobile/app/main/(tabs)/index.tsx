@@ -6,6 +6,7 @@ import { SendRegisterRequest } from '../../../helpers/mapHelper';
 import { Kebab } from '@/interfaces/KebabTypes';
 import { Link, useRouter, useFocusEffect  } from 'expo-router';
 import axios from 'axios';
+import FavouriteHeart from '@/components/FavouriteHeart';
 
 const IndexView = () => {
   const [kebabMarkers, setKebabMarkers] = useState<Kebab[]>([]);
@@ -137,6 +138,9 @@ const IndexView = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
+          <View style={styles.heartContainer}>
+            <FavouriteHeart kebabId={selectedKebab?.id ?? 0} />
+          </View>
             {selectedKebab && (
               <>
                 {selectedKebab.logo_link != '' && selectedKebab.logo_link != null ? (
@@ -205,6 +209,11 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  heartContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 5,
   },
   imageContainer: {
     alignItems: 'center',
