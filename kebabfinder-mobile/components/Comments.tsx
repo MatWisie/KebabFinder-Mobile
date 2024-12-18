@@ -86,13 +86,14 @@ const CommentsComponent: React.FC<{ kebabId: number, endReached: boolean }> = ({
 
     return (
         <View style={{flex:1, width: '100%', marginTop:20, backgroundColor:'#88d7eb', borderRadius:40}}>
-            <View style={{backgroundColor:'#7FC7D9', borderRadius:40}}>
+            <View style={{backgroundColor:'#7FC7D9', borderRadius:40, flexDirection:'row'}}>
                 <TouchableOpacity
                     style={styles.addCommentButton}
                     onPress={() => setAddCommentVisible(true)}
                 >
                     <Fontisto name="comment" size={30} color="blue" />
                 </TouchableOpacity>
+                <Text style={{verticalAlign:'middle'}}>Comments</Text>
             </View>
             <FlatList
                 data={comments.slice(0, commentsToShow)}
