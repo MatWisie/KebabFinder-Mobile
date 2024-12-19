@@ -3,6 +3,7 @@ import React, { useState, useLayoutEffect } from 'react';
 import { Link, router, useLocalSearchParams, useRouter, useNavigation } from 'expo-router';
 import { Kebab, MeatType, OrderWay, Sauce, SocialMedia } from '@/interfaces/KebabTypes';
 import CommentsComponent from '@/components/Comments';
+import LogoDisplay from '@/components/LogoDisplay';
 
   const MoreView = () => {
     const { kebab } = useLocalSearchParams();  
@@ -52,12 +53,7 @@ import CommentsComponent from '@/components/Comments';
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-start', padding:20, backgroundColor:'#DCF2F1'}}>
         {parsedKebab ? (
         <>
-            <View>
-                <Image 
-                source={{ uri: parsedKebab.logo_link }} 
-                style={styles.image} 
-                />
-            </View>
+            <LogoDisplay logoLink={parsedKebab.logo_link}/>
             {(parsedKebab.pyszne_pl_review != null || parsedKebab.google_review != null) && (
                 <View
                     style={{
