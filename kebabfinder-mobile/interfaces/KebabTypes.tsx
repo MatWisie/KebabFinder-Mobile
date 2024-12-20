@@ -75,3 +75,13 @@ export interface SocialMedia {
     created_at: string;
     updated_at: string;
 }
+
+export interface KebabFavourite{
+    name: string,
+    pivot: Pivot
+}
+
+export interface Pivot{
+    user_id: number,
+    kebab_id: number
+}

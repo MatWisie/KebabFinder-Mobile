@@ -6,6 +6,7 @@ import { Fontisto } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { handleRequestError } from '@/helpers/errorHelper';
 import { UserAvatar } from '@/helpers/userHelper';
+import { FormatDate } from '@/helpers/dateHelper';
 
 const CommentsComponent: React.FC<{ kebabId: number, endReached: boolean }> = ({ kebabId, endReached }) => {
     const [comments, setComments] = useState<Comment[]>([]);
@@ -69,7 +70,7 @@ const CommentsComponent: React.FC<{ kebabId: number, endReached: boolean }> = ({
                 <View style={[styles.commentContent, {width:'100%'}]}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', flex: 1 }}>
                         <Text style={styles.userName}>{item.user.name}</Text>
-                        <Text style={{ marginRight:60 }}>19.12.2024</Text>
+                        <Text style={{ marginRight:60 }}>{FormatDate(item.created_at)}</Text>
                     </View>
                     <Text style={styles.commentText}>{item.content}</Text>
                 </View>
@@ -85,13 +86,14 @@ const CommentsComponent: React.FC<{ kebabId: number, endReached: boolean }> = ({
 
     return (
         <View style={{flex:1, width: '100%', marginTop:20, backgroundColor:'#88d7eb', borderRadius:40}}>
-            <View style={{backgroundColor:'#7FC7D9', borderRadius:40}}>
+            <View style={{backgroundColor:'#7FC7D9', borderRadius:40, flexDirection:'row'}}>
                 <TouchableOpacity
                     style={styles.addCommentButton}
                     onPress={() => setAddCommentVisible(true)}
                 >
                     <Fontisto name="comment" size={30} color="blue" />
                 </TouchableOpacity>
+                <Text style={{verticalAlign:'middle'}}>Comments</Text>
             </View>
             <FlatList
                 data={comments.slice(0, commentsToShow)}
@@ -189,8 +191,6 @@ const CommentsComponent: React.FC<{ kebabId: number, endReached: boolean }> = ({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-    },
-    commentDate: {
     },});
   
   export default CommentsComponent;
