@@ -1,3 +1,4 @@
+import SafeImage from '@/components/SafeImage';
 import { ShowAreYouSureAlert } from '@/helpers/alertHelper';
 import { handleRequestError } from '@/helpers/errorHelper';
 import { GetKebabsOutOfFavourites, RemoveFromFavourite, SendGetFavourites } from '@/helpers/favouriteHelper';
@@ -69,8 +70,8 @@ const FavouriteView = () => {
         return (
             <View style={styles.favouriteContainer}>
                 <TouchableOpacity onPress={() => onMore(item)}>
-                    <Image 
-                    source={{ uri: item.logo_link }} 
+                    <SafeImage
+                    imageSource={item.logo_link } 
                     style={styles.logo}/>
                 </TouchableOpacity>
                 <View style={[styles.favouriteContent, {width:'80%'}]}>
