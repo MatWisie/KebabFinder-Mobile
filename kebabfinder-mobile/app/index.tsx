@@ -20,6 +20,7 @@ export default function Index() {
           {
               await AsyncStorage.setItem('userId', userResponse.data.id.toString());
               await AsyncStorage.setItem('userName', userResponse.data.name);
+              await AsyncStorage.setItem('userEmail', userResponse.data.email);
               router.push('/main'); 
           }
 
