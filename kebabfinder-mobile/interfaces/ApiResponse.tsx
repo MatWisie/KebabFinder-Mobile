@@ -10,4 +10,5 @@ export interface RegisterApiResponse{
 export interface SmallUserApiResponse{
     id: number;
     name: string;
+    email: string;
 }

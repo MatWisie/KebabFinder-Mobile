@@ -66,7 +66,7 @@ const CommentsComponent: React.FC<{ kebabId: number, endReached: boolean }> = ({
     const renderComment = ({ item }: { item: Comment }) => {
         return (
             <View style={styles.commentContainer}>
-                <UserAvatar userName={item.user.name}/>
+                <UserAvatar userName={item.user.name} size={40}/>
                 <View style={[styles.commentContent, {width:'100%'}]}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', flex: 1 }}>
                         <Text style={styles.userName}>{item.user.name}</Text>
@@ -113,7 +113,7 @@ const CommentsComponent: React.FC<{ kebabId: number, endReached: boolean }> = ({
             <View style={[styles.modalOverlay]}>
                 <View style={[styles.modalContent,{width:'90%'}]}>
                     <View style={{flexDirection: 'row'}}>
-                        <UserAvatar userName={userName || ''} />
+                        <UserAvatar userName={userName || ''} size={40} />
                         <View style={[styles.commentContent, {width:'80%'}]}>
                             <Text style={styles.userName}>{userName}</Text>
                             <TextInput

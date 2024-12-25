@@ -1,13 +1,44 @@
+import { API_BASE_URL } from "@/config";
+import { ApiResponse } from "@/interfaces/ApiResponse";
+import { UserName, UserPasswordChange } from "@/interfaces/UserTypes";
+import axios, { AxiosResponse } from "axios";
 import { View, StyleSheet, Text } from "react-native";
 
-export const UserAvatar: React.FC<{ userName: string }> = ({ userName }) => { 
+export const UserAvatar: React.FC<{ userName: string; size?: number, fontSize?: number, borderRadius?: number }> = ({ userName, size = 40, fontSize = 15, borderRadius = 20 }) => {
     return (
         <View style={styles.avatarContainer}>
-            <View style={styles.avatar}>
-                <Text style={{color:'white', textAlign:'center', textAlignVertical:'center', verticalAlign:'middle', marginVertical:'auto'}}>{userName.charAt(0)}</Text>
+            <View
+                style={[
+                    styles.avatar,
+                    {
+                        width: size,
+                        height: size,
+                        borderRadius:borderRadius
+                    },
+                ]}
+            >
+                <Text style={{color:'white', fontSize:fontSize, textAlign:'center', textAlignVertical:'center', verticalAlign:'middle', marginVertical:'auto'}}>{userName.charAt(0)}</Text>
             </View>
         </View>
     );
+};
+
+export const SendUserDataChange = async (token:string, userData: UserName) =>{
+    const postHeaders = {
+        Authorization: `Bearer ${token}`, 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+        }
+
+    const response: AxiosResponse<ApiResponse> = await axios.put(
+        API_BASE_URL + `/api/user/change-username?name=${userData.name}`,
+        [], 
+        {
+            headers: postHeaders
+        }
+        );
+        return response;
+}
 }
 
 const styles = StyleSheet.create({
@@ -15,8 +46,5 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     avatar: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
         backgroundColor: 'gray',
     },});
