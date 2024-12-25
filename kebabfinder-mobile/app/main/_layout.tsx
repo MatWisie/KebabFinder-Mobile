@@ -19,6 +19,13 @@ export default function MainLayout() {
           title: "Edit",
         }}
       />
+      <Stack.Screen
+        name="editUserPassword"
+        options={{
+          headerShown: true, 
+          title: "Edit password",
+        }}
+      />
     </Stack>
     );
   }

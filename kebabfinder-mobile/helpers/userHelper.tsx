@@ -39,6 +39,22 @@ export const SendUserDataChange = async (token:string, userData: UserName) =>{
         );
         return response;
 }
+
+export const SendUserPasswordChange = async (token:string, userPasswords: UserPasswordChange) =>{
+    const postHeaders = {
+        Authorization: `Bearer ${token}`, 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+        }
+
+    const response: AxiosResponse<ApiResponse> = await axios.post(
+        API_BASE_URL + `/api/user/change-password`, 
+        userPasswords, 
+        {
+            headers: postHeaders
+        }
+        );
+        return response;
 }
 
 const styles = StyleSheet.create({
