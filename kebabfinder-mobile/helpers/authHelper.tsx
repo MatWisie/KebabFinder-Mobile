@@ -57,3 +57,18 @@ export const LogoutUser = async () =>{
     await AsyncStorage.removeItem('userEmail');
 }
 
+export const LogoutUserFromAllDevices = async (token: string) =>{
+    const postHeaders = {
+        Authorization: `Bearer ${token}`, 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+        }
+        const response: AxiosResponse<ApiResponse> = await axios.post(
+            API_BASE_URL + '/api/logout-from-all',
+            [], 
+            {
+              headers: postHeaders
+            }
+          );
+          return response;
+}

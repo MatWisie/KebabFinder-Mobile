@@ -60,6 +60,20 @@ const UserProfileView = () => {
         router.replace('/auth/login');
     }
 
+    const onLogoutAllPress = async () => {
+        if(await ShowAreYouSureAlert()){
+            try{
+                const logoutResponse = await LogoutUserFromAllDevices(token);
+                if (logoutResponse.status >= 200 && logoutResponse.status < 300) {
+                    await onLogoutPress();
+                }
+            }
+            catch(error){
+                handleRequestError(error);
+            }
+        }
+    }
+
     return (
         <SafeAreaView style={{margin: 40, marginTop:40}}>
             <View style={{alignSelf:'center'}}>
