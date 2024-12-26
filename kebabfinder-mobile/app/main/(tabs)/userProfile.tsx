@@ -5,8 +5,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Fontisto } from '@expo/vector-icons';
 import Feather from '@expo/vector-icons/Feather';
 import { useFocusEffect, useRouter } from 'expo-router';
-import { SendUserRequest } from '@/helpers/authHelper';
+import { LogoutUser, LogoutUserFromAllDevices, SendUserRequest } from '@/helpers/authHelper';
 import { handleRequestError } from '@/helpers/errorHelper';
+import { ShowAreYouSureAlert } from '@/helpers/alertHelper';
 
 const UserProfileView = () => {
     const [userName, setUserName] = useState<string | null>(null);
@@ -54,6 +55,11 @@ const UserProfileView = () => {
           });
     }
 
+    const onLogoutPress = async () => {
+        await LogoutUser();
+        router.replace('/auth/login');
+    }
+
     return (
         <SafeAreaView style={{margin: 40, marginTop:40}}>
             <View style={{alignSelf:'center'}}>
@@ -73,6 +79,12 @@ const UserProfileView = () => {
                 <TouchableOpacity onPress={onPasswordEditPress}>
                     <Feather name="edit-2" size={30} color="blue" />
                 </TouchableOpacity>
+            </View>
+            <View style={{marginTop:20}}>
+                <Button title='Logout' onPress={onLogoutPress}/>
+            </View>
+            <View style={{marginTop:20}}>
+                <Button title='Logout from all devices' onPress={onLogoutAllPress}/>
             </View>
         </SafeAreaView>
     );

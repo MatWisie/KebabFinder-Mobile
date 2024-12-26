@@ -2,6 +2,7 @@ import { API_BASE_URL } from '../config';
 import axios, { AxiosResponse } from 'axios';
 import { ApiResponse, RegisterApiResponse, SmallUserApiResponse } from '../interfaces/ApiResponse';
 import { UserLoginData, UserRegisterData } from '../interfaces/AuthTypes';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const postHeaders = {
     'Content-Type': 'application/json',
@@ -48,3 +49,11 @@ export const SendLoginRequest = async (userData: UserLoginData) =>
     
         return response;
     };
+
+export const LogoutUser = async () =>{
+    await AsyncStorage.removeItem('userToken');
+    await AsyncStorage.removeItem('userId');
+    await AsyncStorage.removeItem('userName');
+    await AsyncStorage.removeItem('userEmail');
+}
+
