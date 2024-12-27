@@ -26,6 +26,13 @@ export default function MainLayout() {
           title: "Edit password",
         }}
       />
+      <Stack.Screen
+        name="kebabList"
+        options={{
+          headerShown: true, 
+          title:''
+        }}
+      />
     </Stack>
     );
   }
