@@ -11,9 +11,12 @@ const SafeImage: React.FC<SafeImageProps> = ({ imageSource, style, ...rest }) =>
     );
 
     const handleError: ImageProps["onError"] = () => {
-        setCurrentSource(require("../assets/images/image-error.png")); 
+        setCurrentSource(require('../assets/images/image-error.png')); 
     };
 
+    if(imageSource == null){
+        return <Image source={require('../assets/images/image-error.png')} style={style} onError={handleError} {...rest} />
+    }
     return <Image source={currentSource} style={style} onError={handleError} {...rest} />;
 };
 
