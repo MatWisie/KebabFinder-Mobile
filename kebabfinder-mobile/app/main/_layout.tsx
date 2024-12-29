@@ -12,6 +12,20 @@ export default function MainLayout() {
           title: "More Details",
         }}
       />
+      <Stack.Screen
+        name="editUserData"
+        options={{
+          headerShown: true, 
+          title: "Edit",
+        }}
+      />
+      <Stack.Screen
+        name="editUserPassword"
+        options={{
+          headerShown: true, 
+          title: "Edit password",
+        }}
+      />
     </Stack>
     );
   }
