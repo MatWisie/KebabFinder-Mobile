@@ -8,7 +8,7 @@ const postHeaders = {
     'Accept': 'application/json'
     }
 
-export const SendRegisterRequest = async (token: string) =>
+export const SendGetKebabsRequest = async (token: string) =>
     {
         const getHeaders = {
             Authorization: `Bearer ${token}`, 

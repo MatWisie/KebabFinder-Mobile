@@ -1,18 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, ActivityIndicator, Modal, Text, TouchableOpacity, Image, Button } from 'react-native';
-import MapView, { UrlTile, Marker, Callout } from 'react-native-maps';
+import MapView, { UrlTile, Marker, Callout, Region } from 'react-native-maps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SendRegisterRequest } from '../../../helpers/mapHelper';
+import { SendGetKebabsRequest } from '../../../helpers/mapHelper';
 import { Kebab } from '@/interfaces/KebabTypes';
-import { Link, useRouter, useFocusEffect  } from 'expo-router';
+import { Link, useRouter, useFocusEffect, useLocalSearchParams  } from 'expo-router';
 import axios from 'axios';
 import FavouriteHeart from '@/components/FavouriteHeart';
+import Feather from '@expo/vector-icons/Feather';
 
 const IndexView = () => {
   const [kebabMarkers, setKebabMarkers] = useState<Kebab[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedKebab, setSelectedKebab] = useState<Kebab | null>(null);
+  const { paramRegion} = useLocalSearchParams();
+  const [initialRegion, setInitialRegion] = useState<Region>({
+    latitude: 51.2070,
+    longitude: 16.1559,
+    latitudeDelta: 0.1,
+    longitudeDelta: 0.1,
+  });
 
   const getMarkerColor = (status:string) =>{
     switch(status){
@@ -30,6 +38,9 @@ const IndexView = () => {
   useFocusEffect(
     React.useCallback(() => {
       setModalVisible(false);
+      if(paramRegion != null && paramRegion != undefined && paramRegion != ''){
+        setInitialRegion(JSON.parse(paramRegion as string));
+      }
     }, [])
   );
 
@@ -38,7 +49,7 @@ const IndexView = () => {
       const userToken = await AsyncStorage.getItem('userToken');
       if (userToken != null) {
         try {
-          const kebabResponse = await SendRegisterRequest(userToken);
+          const kebabResponse = await SendGetKebabsRequest(userToken);
           if (kebabResponse.status >= 200 && kebabResponse.status < 300) {
             setKebabMarkers(kebabResponse.data);
           }
@@ -86,6 +97,11 @@ const IndexView = () => {
     });
   }
 
+  const onKebabList = () => {
+    setModalVisible(false);
+    router.push('/main/kebabList');
+  }
+
   if (loading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
@@ -99,12 +115,7 @@ const IndexView = () => {
       <MapView
         key={kebabMarkers.length}
         style={styles.map}
-        initialRegion={{
-          latitude: 51.2070,
-          longitude: 16.1559,
-          latitudeDelta: 0.1,
-          longitudeDelta: 0.1,
-        }}
+        initialRegion={initialRegion}
       >
         <UrlTile
           urlTemplate="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -129,6 +140,22 @@ const IndexView = () => {
           );
         })}
       </MapView>
+
+      <TouchableOpacity style={{
+            position:'absolute',
+            top: 20,
+            left: 20,
+            width: 50,
+            height: 50,
+            backgroundColor: 'white',
+            borderWidth:1,
+            borderColor:'black',
+            borderRadius: 25,
+            justifyContent: 'center',
+            alignItems: 'center',}}
+            onPress={onKebabList}>
+              <Feather name="list" size={25} color="black"/>
+      </TouchableOpacity>
 
       <Modal
         visible={isModalVisible}
