@@ -2,6 +2,7 @@ import { API_BASE_URL } from '../config';
 import axios, { AxiosResponse } from 'axios';
 import { ApiResponse, RegisterApiResponse, SmallUserApiResponse } from '../interfaces/ApiResponse';
 import { UserLoginData, UserRegisterData } from '../interfaces/AuthTypes';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const postHeaders = {
     'Content-Type': 'application/json',
@@ -48,3 +49,26 @@ export const SendLoginRequest = async (userData: UserLoginData) =>
     
         return response;
     };
+
+export const LogoutUser = async () =>{
+    await AsyncStorage.removeItem('userToken');
+    await AsyncStorage.removeItem('userId');
+    await AsyncStorage.removeItem('userName');
+    await AsyncStorage.removeItem('userEmail');
+}
+
+export const LogoutUserFromAllDevices = async (token: string) =>{
+    const postHeaders = {
+        Authorization: `Bearer ${token}`, 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+        }
+        const response: AxiosResponse<ApiResponse> = await axios.post(
+            API_BASE_URL + '/api/logout-from-all',
+            [], 
+            {
+              headers: postHeaders
+            }
+          );
+          return response;
+}
