@@ -8,12 +8,16 @@ import { useCallback, useState } from "react";
 import { TouchableOpacity, View, Text, StyleSheet, ActivityIndicator, SafeAreaView, FlatList } from "react-native"
 import Feather from '@expo/vector-icons/Feather';
 import { Region } from "react-native-maps";
+import DotsNavigation from "@/components/DotsNavigation";
 
 
 const KebabListView = () =>{
         const [loading, setLoading] = useState(false);
         const [kebabs, setKebabs] = useState<Kebab[]>([]);
+        const [kebabsPage, setKebabsPage] = useState<Kebab[]>([]);
         const [token, setToken] = useState<string | null>('');
+        const [numberOfPages, setNumberOfPages] = useState<number>(0);
+        const itemsPerPage = 10;
         const router = useRouter();
         const onMore = (kebab:Kebab) =>{
             router.push({
@@ -37,6 +41,11 @@ const KebabListView = () =>{
                 params:{ paramRegion: JSON.stringify(tmpRegion)}
               });
         }
+        const onCurrentPageChanged = (pageNumber:number) =>{
+            const startIndex = pageNumber * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            setKebabsPage(kebabs.slice(startIndex, endIndex));
+        }
 
         useFocusEffect(
             useCallback(() => {
@@ -48,6 +57,8 @@ const KebabListView = () =>{
                   const kebabResponse = await SendGetKebabsRequest(userToken ?? '');
                   if (kebabResponse.status >= 200 && kebabResponse.status < 300) {
                     setKebabs(kebabResponse.data);
+                    setNumberOfPages(Math.ceil(kebabResponse.data.length/10));
+                    setKebabsPage(kebabResponse.data.slice(0, itemsPerPage));
                   }
                 } catch (error) {
                   handleRequestError(error);
@@ -92,14 +103,23 @@ const KebabListView = () =>{
     }
 
     return (
-        <SafeAreaView style={{margin:20, padding:20}}>
-            <Text style={{marginBottom:10, fontWeight:'bold'}}>Found kebabs: {kebabs.length}</Text>
-            <FlatList
-                data={kebabs}
-                renderItem={renderKebabs}
-                keyExtractor={(item) => item.id.toString()}
-            />
-        </SafeAreaView>
+        <SafeAreaView style={{ flex: 1, margin: 20, padding: 20 }}>
+        <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>
+          Found kebabs: {kebabs.length}
+        </Text>
+        <View style={{ flex: 1, marginBottom: 10 }}>
+          <FlatList
+            data={kebabsPage}
+            renderItem={renderKebabs}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          />
+        </View>
+        <DotsNavigation
+          numberOfPages={numberOfPages}
+          onPageChange={onCurrentPageChanged}
+        />
+      </SafeAreaView>
     );
     
 }
