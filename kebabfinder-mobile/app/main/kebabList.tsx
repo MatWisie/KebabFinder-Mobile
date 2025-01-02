@@ -4,16 +4,20 @@ import { SendGetKebabsRequest } from "@/helpers/mapHelper";
 import { Kebab } from "@/interfaces/KebabTypes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TouchableOpacity, View, Text, StyleSheet, ActivityIndicator, SafeAreaView, FlatList } from "react-native"
 import Feather from '@expo/vector-icons/Feather';
 import { Region } from "react-native-maps";
 import DotsNavigation from "@/components/DotsNavigation";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import SortPicker from "@/components/SortPicker";
+import { Picker } from "@react-native-picker/picker";
 
 
 const KebabListView = () =>{
         const [loading, setLoading] = useState(false);
         const [kebabs, setKebabs] = useState<Kebab[]>([]);
+        const [kebabsFinal, setKebabsFinal] = useState<Kebab[]>([]);
         const [kebabsPage, setKebabsPage] = useState<Kebab[]>([]);
         const [token, setToken] = useState<string | null>('');
         const [numberOfPages, setNumberOfPages] = useState<number>(0);
@@ -44,8 +48,24 @@ const KebabListView = () =>{
         const onCurrentPageChanged = (pageNumber:number) =>{
             const startIndex = pageNumber * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
-            setKebabsPage(kebabs.slice(startIndex, endIndex));
+            setKebabsPage(kebabsFinal.slice(startIndex, endIndex));
         }
+        const onSortChanged = (item: keyof Kebab, isDescending: boolean) => {
+            const sorted = [...kebabs].sort((a, b) => {
+                if (typeof a[item] === 'string' && typeof b[item] === 'string') {
+                  return isDescending 
+                    ? b[item].localeCompare(a[item]) 
+                    : a[item].localeCompare(b[item]);  
+                } else if (typeof a[item] === 'number' && typeof b[item] === 'number') {
+                  return isDescending
+                    ? b[item] - a[item] 
+                    : a[item] - b[item];  
+                }
+                return 0; 
+              });
+            setKebabsFinal(sorted);
+            setKebabsPage(sorted.slice(0, itemsPerPage));
+          };
 
         useFocusEffect(
             useCallback(() => {
@@ -58,7 +78,6 @@ const KebabListView = () =>{
                   if (kebabResponse.status >= 200 && kebabResponse.status < 300) {
                     setKebabs(kebabResponse.data);
                     setNumberOfPages(Math.ceil(kebabResponse.data.length/10));
-                    setKebabsPage(kebabResponse.data.slice(0, itemsPerPage));
                   }
                 } catch (error) {
                   handleRequestError(error);
@@ -70,6 +89,12 @@ const KebabListView = () =>{
               getKebabs();
             }, [])
           );
+
+        useEffect(() => {
+        if (kebabs.length > 0) {
+            onSortChanged('name', false); 
+        }
+        }, [kebabs]);
     const renderKebabs = ({ item }: { item: Kebab }) => {
         return (
             <View style={styles.kebabContainer}>
@@ -104,9 +129,17 @@ const KebabListView = () =>{
 
     return (
         <SafeAreaView style={{ flex: 1, margin: 20, padding: 20 }}>
-        <Text style={{ marginBottom: 10, fontWeight: 'bold' }}>
-          Found kebabs: {kebabs.length}
-        </Text>
+        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom:10}}>
+            <Text style={{ flex: 1, fontWeight: 'bold', justifyContent:'center'}}>
+                Found kebabs: {kebabsFinal.length}
+            </Text>
+            <View style={{ flexDirection: 'row' }}>
+                <SortPicker sortByChanged={onSortChanged}/>
+                <TouchableOpacity style={{justifyContent:'center'}}>
+                    <MaterialCommunityIcons name="filter" size={24} color="black" />
+                </TouchableOpacity>
+            </View>
+        </View>
         <View style={{ flex: 1, marginBottom: 10 }}>
           <FlatList
             data={kebabsPage}
