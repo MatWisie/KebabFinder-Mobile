@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native"
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Dots from "react-native-dots-pagination"
@@ -18,6 +18,11 @@ const DotsPagination = ({numberOfPages, onPageChange,}: {numberOfPages: number; 
             setActivePage(tmpPage);
         }
     }
+
+    useEffect(() => {
+        setPages(numberOfPages);
+        setActivePage(0); 
+    }, [numberOfPages]);
 
     return (
         <View style={{flexDirection:'row', alignSelf:'center'}}>

@@ -5,13 +5,16 @@ import { Kebab } from "@/interfaces/KebabTypes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { TouchableOpacity, View, Text, StyleSheet, ActivityIndicator, SafeAreaView, FlatList } from "react-native"
+import { TouchableOpacity, View, Text, StyleSheet, ActivityIndicator, SafeAreaView, FlatList, Modal } from "react-native"
 import Feather from '@expo/vector-icons/Feather';
 import { Region } from "react-native-maps";
 import DotsNavigation from "@/components/DotsNavigation";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import SortPicker from "@/components/SortPicker";
 import { Picker } from "@react-native-picker/picker";
+import KebabFilter from "@/components/KebabFilter";
+import { FilterResult } from "@/interfaces/FilterTypes";
+import { filterKebabs } from "@/helpers/filterHelper";
 
 
 const KebabListView = () =>{
@@ -19,8 +22,13 @@ const KebabListView = () =>{
         const [kebabs, setKebabs] = useState<Kebab[]>([]);
         const [kebabsFinal, setKebabsFinal] = useState<Kebab[]>([]);
         const [kebabsPage, setKebabsPage] = useState<Kebab[]>([]);
+        const [isFilterVisible, setIsFilterVisible] = useState(false);
         const [token, setToken] = useState<string | null>('');
         const [numberOfPages, setNumberOfPages] = useState<number>(0);
+
+        var lastSortKey : keyof Kebab = 'name';
+        var lastSortIsDescending : boolean = false;
+
         const itemsPerPage = 10;
         const router = useRouter();
         const onMore = (kebab:Kebab) =>{
@@ -50,8 +58,11 @@ const KebabListView = () =>{
             const endIndex = startIndex + itemsPerPage;
             setKebabsPage(kebabsFinal.slice(startIndex, endIndex));
         }
-        const onSortChanged = (item: keyof Kebab, isDescending: boolean) => {
-            const sorted = [...kebabs].sort((a, b) => {
+        const onSortChanged = (item: keyof Kebab, isDescending: boolean, kebabsToSort:Kebab[] = [], force: boolean = false) => {
+            if(kebabsToSort.length == 0 && !force) kebabsToSort = kebabsFinal;
+            lastSortKey = item;
+            lastSortIsDescending = isDescending;
+            const sorted = [...kebabsToSort].sort((a, b) => {
                 if (typeof a[item] === 'string' && typeof b[item] === 'string') {
                   return isDescending 
                     ? b[item].localeCompare(a[item]) 
@@ -66,6 +77,16 @@ const KebabListView = () =>{
             setKebabsFinal(sorted);
             setKebabsPage(sorted.slice(0, itemsPerPage));
           };
+        const onFilter = (filterResult: FilterResult) => {
+          setIsFilterVisible(false);
+          const filteredKebabs = filterKebabs(kebabs, filterResult);
+          setKebabsFinal(filteredKebabs);
+          setNumberOfPages(Math.ceil(filteredKebabs.length/10));
+          onSortChanged(lastSortKey, lastSortIsDescending, filteredKebabs, true);
+        }
+        const onFilterOff = () => {
+          setIsFilterVisible(false);
+        }
 
         useFocusEffect(
             useCallback(() => {
@@ -85,14 +106,15 @@ const KebabListView = () =>{
                   setLoading(false);
                 }
               };
-          
+              setIsFilterVisible(false);
               getKebabs();
             }, [])
           );
 
         useEffect(() => {
         if (kebabs.length > 0) {
-            onSortChanged('name', false); 
+            setKebabsFinal(kebabs)
+            onSortChanged('name', false, kebabs, true); 
         }
         }, [kebabs]);
     const renderKebabs = ({ item }: { item: Kebab }) => {
@@ -135,7 +157,7 @@ const KebabListView = () =>{
             </Text>
             <View style={{ flexDirection: 'row' }}>
                 <SortPicker sortByChanged={onSortChanged}/>
-                <TouchableOpacity style={{justifyContent:'center'}}>
+                <TouchableOpacity style={{justifyContent:'center'}} onPress={() => {setIsFilterVisible(true)}}>
                     <MaterialCommunityIcons name="filter" size={24} color="black" />
                 </TouchableOpacity>
             </View>
@@ -152,6 +174,10 @@ const KebabListView = () =>{
           numberOfPages={numberOfPages}
           onPageChange={onCurrentPageChanged}
         />
+
+        <Modal animationType='slide' visible={isFilterVisible}>
+           <KebabFilter kebabs={kebabs} onApply={onFilter} onClose={onFilterOff}/>
+        </Modal>
       </SafeAreaView>
     );
     
