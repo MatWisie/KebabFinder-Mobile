@@ -33,6 +33,14 @@ export default function MainLayout() {
           title:''
         }}
       />
+
+      <Stack.Screen
+        name="kebabReport"
+        options={{
+          headerShown: true, 
+          title:''
+        }}
+      />
     </Stack>
     );
   }
