@@ -8,12 +8,14 @@ import { Link, useRouter, useFocusEffect, useLocalSearchParams  } from 'expo-rou
 import axios from 'axios';
 import FavouriteHeart from '@/components/FavouriteHeart';
 import Feather from '@expo/vector-icons/Feather';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const IndexView = () => {
   const [kebabMarkers, setKebabMarkers] = useState<Kebab[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedKebab, setSelectedKebab] = useState<Kebab | null>(null);
+  const [userToken, setUserToken] = useState<string>('');
   const { paramRegion} = useLocalSearchParams();
   const [initialRegion, setInitialRegion] = useState<Region>({
     latitude: 51.2070,
@@ -49,6 +51,7 @@ const IndexView = () => {
       const userToken = await AsyncStorage.getItem('userToken');
       if (userToken != null) {
         try {
+          setUserToken(userToken);
           const kebabResponse = await SendGetKebabsRequest(userToken);
           if (kebabResponse.status >= 200 && kebabResponse.status < 300) {
             setKebabMarkers(kebabResponse.data);
@@ -100,6 +103,18 @@ const IndexView = () => {
   const onKebabList = () => {
     setModalVisible(false);
     router.push('/main/kebabList');
+  }
+
+  const onReportKebab = () =>{
+    setModalVisible(false);
+    router.push({
+      pathname: '/main/kebabReport',
+      params:
+      { 
+        tokenSearchParam: userToken,
+        kebabIdSearchParam: selectedKebab?.id
+      }
+    });
   }
 
   if (loading) {
@@ -166,6 +181,9 @@ const IndexView = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
           <View style={styles.heartContainer}>
+            <TouchableOpacity style={{marginRight:10}} onPress={onReportKebab}>
+              <Ionicons name="flag" size={25} color="gray"/>
+            </TouchableOpacity>
             <FavouriteHeart kebabId={selectedKebab?.id ?? 0} />
           </View>
             {selectedKebab && (
