@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, ActivityIndicator, Modal, Text, TouchableOpacity, Image, Button } from 'react-native';
-import MapView, { UrlTile, Marker, Callout, Region } from 'react-native-maps';
+import MapView, { UrlTile, Marker, Callout, Region, PROVIDER_GOOGLE } from 'react-native-maps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SendGetKebabsRequest } from '../../../helpers/mapHelper';
 import { Kebab } from '@/interfaces/KebabTypes';
@@ -131,12 +131,8 @@ const IndexView = () => {
         key={kebabMarkers.length}
         style={styles.map}
         initialRegion={initialRegion}
+        provider={PROVIDER_GOOGLE}
       >
-        <UrlTile
-          urlTemplate="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          maximumZ={19}
-          flipY={false}
-        />
 
         {kebabMarkers.map((kebab) => {
           const [latitude, longitude] = kebab.coordinates
