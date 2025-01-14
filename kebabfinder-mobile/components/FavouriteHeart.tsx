@@ -63,7 +63,7 @@ const FavouriteHeart: React.FC<{ kebabId: number}> = (kebabId) =>
 
         return(
             <TouchableOpacity onPress={() => isFavourite ? OnClickRemoveFromFavourite() : OnClickAddToFavourite()} style={{alignSelf:'flex-end'}}>
-                <Fontisto name='favorite' size={30} color={heartColor} />
+                <Fontisto name='favorite' size={25} color={heartColor} />
             </TouchableOpacity>
         )
     }

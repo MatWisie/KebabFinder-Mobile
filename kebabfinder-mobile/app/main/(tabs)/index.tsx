@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, ActivityIndicator, Modal, Text, TouchableOpacity, Image, Button } from 'react-native';
-import MapView, { UrlTile, Marker, Callout, Region } from 'react-native-maps';
+import MapView, { UrlTile, Marker, Callout, Region, PROVIDER_GOOGLE } from 'react-native-maps';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SendGetKebabsRequest } from '../../../helpers/mapHelper';
 import { Kebab } from '@/interfaces/KebabTypes';
@@ -8,12 +8,14 @@ import { Link, useRouter, useFocusEffect, useLocalSearchParams  } from 'expo-rou
 import axios from 'axios';
 import FavouriteHeart from '@/components/FavouriteHeart';
 import Feather from '@expo/vector-icons/Feather';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const IndexView = () => {
   const [kebabMarkers, setKebabMarkers] = useState<Kebab[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedKebab, setSelectedKebab] = useState<Kebab | null>(null);
+  const [userToken, setUserToken] = useState<string>('');
   const { paramRegion} = useLocalSearchParams();
   const [initialRegion, setInitialRegion] = useState<Region>({
     latitude: 51.2070,
@@ -49,6 +51,7 @@ const IndexView = () => {
       const userToken = await AsyncStorage.getItem('userToken');
       if (userToken != null) {
         try {
+          setUserToken(userToken);
           const kebabResponse = await SendGetKebabsRequest(userToken);
           if (kebabResponse.status >= 200 && kebabResponse.status < 300) {
             setKebabMarkers(kebabResponse.data);
@@ -102,6 +105,18 @@ const IndexView = () => {
     router.push('/main/kebabList');
   }
 
+  const onReportKebab = () =>{
+    setModalVisible(false);
+    router.push({
+      pathname: '/main/kebabReport',
+      params:
+      { 
+        tokenSearchParam: userToken,
+        kebabIdSearchParam: selectedKebab?.id
+      }
+    });
+  }
+
   if (loading) {
     return (
       <View style={[styles.container, styles.loadingContainer]}>
@@ -116,12 +131,8 @@ const IndexView = () => {
         key={kebabMarkers.length}
         style={styles.map}
         initialRegion={initialRegion}
+        provider={PROVIDER_GOOGLE}
       >
-        <UrlTile
-          urlTemplate="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          maximumZ={19}
-          flipY={false}
-        />
 
         {kebabMarkers.map((kebab) => {
           const [latitude, longitude] = kebab.coordinates
@@ -166,6 +177,9 @@ const IndexView = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
           <View style={styles.heartContainer}>
+            <TouchableOpacity style={{marginRight:10}} onPress={onReportKebab}>
+              <Ionicons name="flag" size={25} color="gray"/>
+            </TouchableOpacity>
             <FavouriteHeart kebabId={selectedKebab?.id ?? 0} />
           </View>
             {selectedKebab && (

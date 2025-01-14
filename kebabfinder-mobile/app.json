@@ -13,13 +13,24 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.wisnia.kebabfindermobile",
+      "config": {
+        "apiKey": "AIzaSyDxHOCnvu2lvHgAMRN9onsuKij1QHa8y4k"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBAHVvKGMO6lyUFLmqmlHGqIUlmkgzJv64"
+        },
+        "cleartextTraffic": true
+      },
+      "package": "com.wisnia.kebabfindermobile"
     },
     "web": {
       "bundler": "metro",
@@ -28,10 +39,26 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      [
+      "expo-build-properties",
+      {
+        "android":{
+          "usesCleartextTraffic": true
+        }
+      }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "98261398-bbe4-4cb8-b429-e85ec177ff43"
+      }
     }
   }
 }
