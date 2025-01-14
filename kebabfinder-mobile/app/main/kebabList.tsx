@@ -4,16 +4,32 @@ import { SendGetKebabsRequest } from "@/helpers/mapHelper";
 import { Kebab } from "@/interfaces/KebabTypes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
-import { TouchableOpacity, View, Text, StyleSheet, ActivityIndicator, SafeAreaView, FlatList } from "react-native"
+import { useCallback, useEffect, useState } from "react";
+import { TouchableOpacity, View, Text, StyleSheet, ActivityIndicator, SafeAreaView, FlatList, Modal } from "react-native"
 import Feather from '@expo/vector-icons/Feather';
 import { Region } from "react-native-maps";
+import DotsNavigation from "@/components/DotsNavigation";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import SortPicker from "@/components/SortPicker";
+import { Picker } from "@react-native-picker/picker";
+import KebabFilter from "@/components/KebabFilter";
+import { FilterResult } from "@/interfaces/FilterTypes";
+import { filterKebabs } from "@/helpers/filterHelper";
 
 
 const KebabListView = () =>{
         const [loading, setLoading] = useState(false);
         const [kebabs, setKebabs] = useState<Kebab[]>([]);
+        const [kebabsFinal, setKebabsFinal] = useState<Kebab[]>([]);
+        const [kebabsPage, setKebabsPage] = useState<Kebab[]>([]);
+        const [isFilterVisible, setIsFilterVisible] = useState(false);
         const [token, setToken] = useState<string | null>('');
+        const [numberOfPages, setNumberOfPages] = useState<number>(0);
+
+        var lastSortKey : keyof Kebab = 'name';
+        var lastSortIsDescending : boolean = false;
+
+        const itemsPerPage = 10;
         const router = useRouter();
         const onMore = (kebab:Kebab) =>{
             router.push({
@@ -37,6 +53,40 @@ const KebabListView = () =>{
                 params:{ paramRegion: JSON.stringify(tmpRegion)}
               });
         }
+        const onCurrentPageChanged = (pageNumber:number) =>{
+            const startIndex = pageNumber * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            setKebabsPage(kebabsFinal.slice(startIndex, endIndex));
+        }
+        const onSortChanged = (item: keyof Kebab, isDescending: boolean, kebabsToSort:Kebab[] = [], force: boolean = false) => {
+            if(kebabsToSort.length == 0 && !force) kebabsToSort = kebabsFinal;
+            lastSortKey = item;
+            lastSortIsDescending = isDescending;
+            const sorted = [...kebabsToSort].sort((a, b) => {
+                if (typeof a[item] === 'string' && typeof b[item] === 'string') {
+                  return isDescending 
+                    ? b[item].localeCompare(a[item]) 
+                    : a[item].localeCompare(b[item]);  
+                } else if (typeof a[item] === 'number' && typeof b[item] === 'number') {
+                  return isDescending
+                    ? b[item] - a[item] 
+                    : a[item] - b[item];  
+                }
+                return 0; 
+              });
+            setKebabsFinal(sorted);
+            setKebabsPage(sorted.slice(0, itemsPerPage));
+          };
+        const onFilter = (filterResult: FilterResult) => {
+          setIsFilterVisible(false);
+          const filteredKebabs = filterKebabs(kebabs, filterResult);
+          setKebabsFinal(filteredKebabs);
+          setNumberOfPages(Math.ceil(filteredKebabs.length/10));
+          onSortChanged(lastSortKey, lastSortIsDescending, filteredKebabs, true);
+        }
+        const onFilterOff = () => {
+          setIsFilterVisible(false);
+        }
 
         useFocusEffect(
             useCallback(() => {
@@ -48,6 +98,7 @@ const KebabListView = () =>{
                   const kebabResponse = await SendGetKebabsRequest(userToken ?? '');
                   if (kebabResponse.status >= 200 && kebabResponse.status < 300) {
                     setKebabs(kebabResponse.data);
+                    setNumberOfPages(Math.ceil(kebabResponse.data.length/10));
                   }
                 } catch (error) {
                   handleRequestError(error);
@@ -55,10 +106,17 @@ const KebabListView = () =>{
                   setLoading(false);
                 }
               };
-          
+              setIsFilterVisible(false);
               getKebabs();
             }, [])
           );
+
+        useEffect(() => {
+        if (kebabs.length > 0) {
+            setKebabsFinal(kebabs)
+            onSortChanged('name', false, kebabs, true); 
+        }
+        }, [kebabs]);
     const renderKebabs = ({ item }: { item: Kebab }) => {
         return (
             <View style={styles.kebabContainer}>
@@ -92,14 +150,35 @@ const KebabListView = () =>{
     }
 
     return (
-        <SafeAreaView style={{margin:20, padding:20}}>
-            <Text style={{marginBottom:10, fontWeight:'bold'}}>Found kebabs: {kebabs.length}</Text>
-            <FlatList
-                data={kebabs}
-                renderItem={renderKebabs}
-                keyExtractor={(item) => item.id.toString()}
-            />
-        </SafeAreaView>
+        <SafeAreaView style={{ flex: 1, margin: 20, padding: 20 }}>
+        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom:10}}>
+            <Text style={{ flex: 1, fontWeight: 'bold', justifyContent:'center'}}>
+                Found kebabs: {kebabsFinal.length}
+            </Text>
+            <View style={{ flexDirection: 'row' }}>
+                <SortPicker sortByChanged={onSortChanged}/>
+                <TouchableOpacity style={{justifyContent:'center'}} onPress={() => {setIsFilterVisible(true)}}>
+                    <MaterialCommunityIcons name="filter" size={24} color="black" />
+                </TouchableOpacity>
+            </View>
+        </View>
+        <View style={{ flex: 1, marginBottom: 10 }}>
+          <FlatList
+            data={kebabsPage}
+            renderItem={renderKebabs}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          />
+        </View>
+        <DotsNavigation
+          numberOfPages={numberOfPages}
+          onPageChange={onCurrentPageChanged}
+        />
+
+        <Modal animationType='slide' visible={isFilterVisible}>
+           <KebabFilter kebabs={kebabs} onApply={onFilter} onClose={onFilterOff}/>
+        </Modal>
+      </SafeAreaView>
     );
     
 }
